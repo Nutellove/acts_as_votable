@@ -156,7 +156,7 @@ module ActsAsVotable
     end
 
     def votes_sum
-
+      find_votes.map(&:value).inject(0, :+)
     end
 
     ## COUNTING
