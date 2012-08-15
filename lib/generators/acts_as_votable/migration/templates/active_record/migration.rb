@@ -5,7 +5,7 @@ class ActsAsVotableMigration < ActiveRecord::Migration
       t.references :votable, :polymorphic => true
       t.references :voter, :polymorphic => true
 
-      t.boolean :vote_flag
+      t.integer :value
 
       t.timestamps
     end

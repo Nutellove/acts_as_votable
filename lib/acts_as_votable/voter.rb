@@ -54,13 +54,13 @@ module ActsAsVotable
     alias :voted_for? :voted_on?
 
     def voted_up_on? votable
-      votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name, :vote_flag => true)
+      votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name, :value => 1)
       votes.size > 0
     end
     alias :voted_up_for? :voted_up_on?
 
     def voted_down_on? votable
-      votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name, :vote_flag => false)
+      votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name, :value => -1)
       votes.size > 0
     end
     alias :voted_down_for? :voted_down_on?
@@ -68,7 +68,7 @@ module ActsAsVotable
     def voted_as_when_voting_on votable
       votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name)
       return nil if votes.size == 0
-      return votes.first.vote_flag
+      return votes.first.value
     end
     alias :voted_as_when_voted_for :voted_as_when_voting_on
 
@@ -77,11 +77,11 @@ module ActsAsVotable
     end
 
     def find_up_votes
-      find_votes :vote_flag => true
+      find_votes :value => 1
     end
 
     def find_down_votes
-      find_votes :vote_flag => false
+      find_votes :value => -1
     end
 
     def find_votes_for_class klass, extra_conditions = {}
@@ -89,11 +89,11 @@ module ActsAsVotable
     end
 
     def find_up_votes_for_class klass
-      find_votes_for_class klass, :vote_flag => true
+      find_votes_for_class klass, :value => 1
     end
 
     def find_down_votes_for_class klass
-      find_votes_for_class klass, :vote_flag => false
+      find_votes_for_class klass, :value => -1
     end
 
   end

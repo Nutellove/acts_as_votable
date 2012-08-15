@@ -95,7 +95,7 @@ module ActsAsVotable
 
       last_update = vote.updated_at
 
-      vote.vote_flag = votable_words.meaning_of(options[:vote])
+      vote.value = votable_words.integer_meaning_of(options[:vote])
 
       if vote.save
         self.vote_registered = true if last_update != vote.updated_at
@@ -155,11 +155,11 @@ module ActsAsVotable
     end
 
     def up_votes
-      find_votes(:vote_flag => true)
+      find_votes(:value => 1)
     end
 
     def down_votes
-      find_votes(:vote_flag => false)
+      find_votes(:value => -1)
     end
 
 

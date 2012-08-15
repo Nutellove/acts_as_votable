@@ -8,7 +8,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.references :votable, :polymorphic => true
     t.references :voter, :polymorphic => true
 
-    t.boolean :vote_flag
+    t.integer :value
 
     t.timestamps
   end

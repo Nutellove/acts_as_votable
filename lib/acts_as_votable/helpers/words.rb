@@ -32,5 +32,19 @@ module ActsAsVotable::Helpers
       !that_mean_false.include?(word)
     end
 
+    def self.that_mean_one
+      ['up', 'upvote', 'like', 'liked', 'positive', 'yes', 'good', 'true', 1, true]
+    end
+    def self.that_mean_minus_one
+      ['down', 'downvote', 'dislike', 'disliked', 'negative', 'no', 'bad', 'false', -1, false]
+    end
+
+    def self.integer_meaning_of word
+      return word if word.is_a? Integer
+      return  1   if that_mean_one.include? word
+      return -1   if that_mean_minus_one.include? word
+      return  0
+    end
+
   end
 end

@@ -41,14 +41,14 @@ describe ActsAsVotable::Voter do
       @voter.voted_on?(@votable).should be false
     end
 
-    it "should be voted as true when a voter has voted true" do
+    it "should be voted as 1 when a voter has voted without parameters" do
       @votable.vote :voter => @voter
-      @voter.voted_as_when_voted_for(@votable).should be true
+      @voter.voted_as_when_voted_for(@votable).should be 1
     end
 
-    it "should be voted as false when a voter has voted false" do
+    it "should be voted as -1 when a voter has voted false" do
       @votable.vote :voter => @voter, :vote => false
-      @voter.voted_as_when_voted_for(@votable).should be false
+      @voter.voted_as_when_voted_for(@votable).should be -1
     end
 
     it "should be voted as nil when a voter has never voted" do
@@ -77,7 +77,7 @@ describe ActsAsVotable::Voter do
 
     it "should provide reserve functionality, voter can vote on votable" do
       @voter.vote :votable => @votable, :vote => 'bad'
-      @voter.voted_as_when_voting_on(@votable).should be false
+      @voter.voted_as_when_voting_on(@votable).should be -1
     end
 
     it "should allow the voter to vote up a model" do
@@ -142,7 +142,7 @@ describe ActsAsVotable::Voter do
       @voter.vote :votable => @votable, :vote => false
       @voter2.vote :votable => @votable
 
-      @voter.voted_as_when_voting_on(@votable).should be false
+      @voter.voted_as_when_voting_on(@votable).should be -1
     end
 
   end

@@ -8,13 +8,13 @@ module ActsAsVotable
     attr_accessible :votable_id, :votable_type,
       :voter_id, :voter_type,
       :votable, :voter,
-      :vote_flag
+      :value
 
     belongs_to :votable, :polymorphic => true
     belongs_to :voter, :polymorphic => true
 
-    scope :up, where(:vote_flag => true)
-    scope :down, where(:vote_flag => false)
+    scope :up, where(:value => 1)
+    scope :down, where(:value => -1)
     scope :for_type, lambda{ |klass| where(:votable_type => klass) }
     scope :by_type,  lambda{ |klass| where(:voter_type => klass) }
 
