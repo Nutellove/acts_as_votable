@@ -13,7 +13,7 @@ module ActsAsVotable
       base.class_eval do
 
         belongs_to :voter, :polymorphic => true
-        has_many :votes, :class_name => "ActsAsVotable::Vote", :as => :voter do
+        has_many   :votes, :class_name => "ActsAsVotable::Vote", :as => :voter do
           def votables
             includes(:votable).map(&:votable)
           end
@@ -35,11 +35,15 @@ module ActsAsVotable
     end
 
     def vote_up_for model=nil
-      vote :votable => model, :vote => true
+      vote :votable => model, :vote => 1
+    end
+
+    def vote_obiwan_for model=nil
+      vote :votable => model, :vote => 0
     end
 
     def vote_down_for model
-      vote :votable => model, :vote => false
+      vote :votable => model, :vote => -1
     end
 
     def unvote_for model
@@ -80,8 +84,16 @@ module ActsAsVotable
       find_votes :value => 1
     end
 
+    def find_obiwan_votes
+      find_votes :value => 0
+    end
+
     def find_down_votes
       find_votes :value => -1
+    end
+
+    def find_votes_by_value value
+      find_votes :value => value
     end
 
     def find_votes_for_class klass, extra_conditions = {}

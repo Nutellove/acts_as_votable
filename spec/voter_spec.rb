@@ -41,38 +41,75 @@ describe ActsAsVotable::Voter do
       @voter.voted_on?(@votable).should be false
     end
 
-    it "should be voted as 1 when a voter has voted without parameters" do
-      @votable.vote :voter => @voter
-      @voter.voted_as_when_voted_for(@votable).should be 1
+    describe '#voted_as_when_voted_for' do
+
+      it "should return nil when a voter has never voted" do
+        @voter.voted_as_when_voted_for(@votable).should be nil
+      end
+
+      it "should return 1 when a voter has voted without parameters" do
+        @votable.vote :voter => @voter
+        @voter.voted_as_when_voted_for(@votable).should be 1
+      end
+
+      it "should return 1 when a voter has voted true" do
+        @votable.vote :voter => @voter, :vote => true
+        @voter.voted_as_when_voted_for(@votable).should be 1
+      end
+
+      it "should return -1 when a voter has voted false" do
+        @votable.vote :voter => @voter, :vote => false
+        @voter.voted_as_when_voted_for(@votable).should be -1
+      end
+
+      it "should return 42 when a voter has voted 42" do
+        @votable.vote :voter => @voter, :vote => 42
+        @voter.voted_as_when_voted_for(@votable).should be 42
+      end
+
+      it "has #voted_as_when_voting_on as alias" do
+        @votable.vote :voter => @voter, :vote => -69
+        @voter.voted_as_when_voting_on(@votable).should be -69
+      end
+
     end
 
-    it "should be voted as -1 when a voter has voted false" do
-      @votable.vote :voter => @voter, :vote => false
-      @voter.voted_as_when_voted_for(@votable).should be -1
+    describe '#voted_up_on?' do
+
+      it "should return true if voter has voted true" do
+        @votable.vote :voter => @voter
+        @voter.voted_up_on?(@votable).should be true
+      end
+
+      it "should return false if voter has voted false" do
+        @votable.vote :voter => @voter, :vote => false
+        @voter.voted_up_on?(@votable).should be false
+      end
+
+      it "should return false if voter has voted obiwan" do
+        @votable.vote :voter => @voter, :vote => 0
+        @voter.voted_up_on?(@votable).should be false
+      end
+
     end
 
-    it "should be voted as nil when a voter has never voted" do
-      @voter.voted_as_when_voting_on(@votable).should be nil
-    end
+    describe '#voted_down_on?' do
 
-    it "should return true if voter has voted true" do
-      @votable.vote :voter => @voter
-      @voter.voted_up_on?(@votable).should be true
-    end
+      it "should return true if the voter has voted false" do
+        @votable.vote :voter => @voter, :vote => false
+        @voter.voted_down_on?(@votable).should be true
+      end
 
-    it "should return false if voter has not voted true" do
-      @votable.vote :voter => @voter, :vote => false
-      @voter.voted_up_on?(@votable).should be false
-    end
+      it "should return false if the voter has not voted true" do
+        @votable.vote :voter => @voter, :vote => true
+        @voter.voted_down_on?(@votable).should be false
+      end
 
-    it "should return true if the voter has voted false" do
-      @votable.vote :voter => @voter, :vote => false
-      @voter.voted_down_on?(@votable).should be true
-    end
+      it "should return false if the voter has voted obiwan" do
+        @votable.vote :voter => @voter, :vote => 0
+        @voter.voted_down_on?(@votable).should be false
+      end
 
-    it "should return false if the voter has not voted false" do
-      @votable.vote :voter => @voter, :vote => true
-      @voter.voted_down_on?(@votable).should be false
     end
 
     it "should provide reserve functionality, voter can vote on votable" do

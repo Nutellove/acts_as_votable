@@ -95,7 +95,7 @@ module ActsAsVotable
 
       last_update = vote.updated_at
 
-      vote.value = votable_words.integer_meaning_of(options[:vote])
+      vote.value = votable_words.meaning_of(options[:vote])
 
       if vote.save
         self.vote_registered = true if last_update != vote.updated_at
