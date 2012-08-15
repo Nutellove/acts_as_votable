@@ -72,7 +72,7 @@ module ActsAsVotable
     def voted_as_when_voting_on votable
       votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name)
       return nil if votes.size == 0
-      return votes.first.value
+      votes.first.value
     end
     alias :voted_as_when_voted_for :voted_as_when_voting_on
 

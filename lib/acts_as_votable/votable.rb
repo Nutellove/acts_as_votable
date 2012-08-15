@@ -12,7 +12,7 @@ module ActsAsVotable
 
         :vote_up => [
           :up_by, :upvote_by, :like_by, :liked_by, :vote_by, 
-          :up_from, :upvote_from, :upvote_by, :like_from, :liked_from, :vote_from 
+          :up_from, :upvote_from, :upvote_by, :like_from, :liked_from, :vote_from
         ],
 
         :vote_down => [
@@ -27,9 +27,11 @@ module ActsAsVotable
         :down_votes => [
           :false_votes, :downs, :downvotes, :dislikes, :negatives
         ],
+
         :unvote => [
           :unliked_by, :undisliked_by
-        ]
+        ],
+
       }
 
       base.class_eval do
@@ -67,7 +69,7 @@ module ActsAsVotable
     def vote args = {}
 
       options = {
-        :vote => true,
+        :vote => 0,
       }.merge(args)
 
       self.vote_registered = false
@@ -77,12 +79,9 @@ module ActsAsVotable
       end
 
       # find the vote
-      _votes_ = find_votes({
-        :voter_id => options[:voter].id,
-        :voter_type => options[:voter].class.name
-      })
+      _vote = vote_of options[:voter]
 
-      if _votes_.count == 0
+      if _vote.nil?
         # this voter has never voted
         vote = ActsAsVotable::Vote.new(
           :votable => self,
@@ -90,27 +89,28 @@ module ActsAsVotable
         )
       else
         # this voter is potentially changing his vote
-        vote = _votes_.first
+        vote = _vote
       end
 
       last_update = vote.updated_at
 
       vote.value = votable_words.meaning_of(options[:vote])
 
-      if vote.save
+      save_is_a_success = vote.save
+
+      if save_is_a_success
         self.vote_registered = true if last_update != vote.updated_at
         update_cached_votes
-        return true
       else
         self.vote_registered = false
-        return false
       end
 
+      save_is_a_success
     end
 
     def unvote args = {}
       return false if args[:voter].nil?
-      _votes_ = find_votes(:voter_id => args[:voter].id, :voter_type => args[:voter].class.name)
+      _votes_ = votes_of args[:voter]
 
       return true if _votes_.size == 0
       _votes_.each(&:destroy)
@@ -120,11 +120,15 @@ module ActsAsVotable
     end
 
     def vote_up voter
-      self.vote :voter => voter, :vote => true
+      self.vote :voter => voter, :vote => 1
+    end
+
+    def vote_obiwan voter
+      self.vote :voter => voter, :vote => 0
     end
 
     def vote_down voter
-      self.vote :voter => voter, :vote => false
+      self.vote :voter => voter, :vote => -1
     end
 
     # caching
@@ -138,6 +142,10 @@ module ActsAsVotable
 
       if self.respond_to?(:cached_votes_up=)
         updates[:cached_votes_up] = count_votes_up(true)
+      end
+
+      if self.respond_to?(:cached_votes_obiwan=)
+        updates[:cached_votes_obiwan] = count_votes_obiwan(true)
       end
 
       if self.respond_to?(:cached_votes_down=)
@@ -158,12 +166,17 @@ module ActsAsVotable
       find_votes(:value => 1)
     end
 
+    def obiwan_votes
+      find_votes(:value => 0)
+    end
+
     def down_votes
       find_votes(:value => -1)
     end
 
 
-    # counting
+    ## COUNTING
+
     def count_votes_total skip_cache = false
       if !skip_cache && self.respond_to?(:cached_votes_total)
         return self.send(:cached_votes_total)
@@ -178,6 +191,13 @@ module ActsAsVotable
       up_votes.count
     end
 
+    def count_votes_obiwan skip_cache = false
+      if !skip_cache && self.respond_to?(:cached_votes_obiwan)
+        return self.send(:cached_votes_obiwan)
+      end
+      obiwan_votes.count
+    end
+
     def count_votes_down skip_cache = false
       if !skip_cache && self.respond_to?(:cached_votes_down)
         return self.send(:cached_votes_down)
@@ -185,10 +205,23 @@ module ActsAsVotable
       down_votes.count
     end
 
-    # voters
+    ## VOTERS
+
     def voted_on_by? voter
-      votes = find_votes :voter_id => voter.id, :voter_type => voter.class.name
-      votes.count > 0
+      votes_of(voter).count > 0
+    end
+
+    def votes_of voter
+      find_votes(:voter_id => voter.id, :voter_type => voter.class.name)
+    end
+
+    def vote_of voter
+      votes_of(voter).first
+    end
+
+    def vote_value_of voter
+      vote = vote_of voter
+      (vote) ? vote.value : nil
     end
 
   end

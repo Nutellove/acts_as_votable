@@ -7,11 +7,11 @@ describe ActsAsVotable::Helpers::Words do
     @vote = ActsAsVotable::Vote.new
   end
 
-  it "should know that like is a true vote" do
+  it "should know that like is a +1 vote" do
     @vote.votable_words.that_mean_one.should include "like"
   end
 
-  it "should know that bad is a false vote" do
+  it "should know that bad is a -1 vote" do
     @vote.votable_words.that_mean_minus_one.should include "bad"
   end
 

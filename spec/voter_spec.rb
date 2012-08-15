@@ -8,11 +8,11 @@ describe ActsAsVotable::Voter do
   end
 
   it "should not be a voter" do
-    NotVotable.should_not be_votable
+    NotVoter.should_not be_voter
   end
 
   it "should be a voter" do
-    Votable.should be_votable
+    Voter.should be_voter
   end
 
   describe "voting by a voter" do
@@ -47,9 +47,9 @@ describe ActsAsVotable::Voter do
         @voter.voted_as_when_voted_for(@votable).should be nil
       end
 
-      it "should return 1 when a voter has voted without parameters" do
+      it "should return 0 when a voter has voted without parameters" do
         @votable.vote :voter => @voter
-        @voter.voted_as_when_voted_for(@votable).should be 1
+        @voter.voted_as_when_voted_for(@votable).should be 0
       end
 
       it "should return 1 when a voter has voted true" do
@@ -77,12 +77,12 @@ describe ActsAsVotable::Voter do
     describe '#voted_up_on?' do
 
       it "should return true if voter has voted true" do
-        @votable.vote :voter => @voter
+        @votable.vote :voter => @voter, :vote => 1
         @voter.voted_up_on?(@votable).should be true
       end
 
       it "should return false if voter has voted false" do
-        @votable.vote :voter => @voter, :vote => false
+        @votable.vote :voter => @voter, :vote => -1
         @voter.voted_up_on?(@votable).should be false
       end
 
@@ -155,29 +155,29 @@ describe ActsAsVotable::Voter do
     end
 
     it "should get all of the votes votes for a class" do
-      @votable.vote :voter => @voter
-      @votable2.vote :voter => @voter, :vote => false
+      @votable.vote :voter => @voter, :vote => 1
+      @votable2.vote :voter => @voter, :vote => -1
       @voter.find_votes_for_class(Votable).size.should == 2
       @voter.votes.for_type(Votable).count.should == 2
     end
 
     it "should get all of the voters up votes for a class" do
-      @votable.vote :voter => @voter
-      @votable2.vote :voter => @voter, :vote => false
+      @votable.vote :voter => @voter, :vote => 1
+      @votable2.vote :voter => @voter, :vote => -1
       @voter.find_up_votes_for_class(Votable).size.should == 1
       @voter.votes.up.for_type(Votable).count.should == 1
     end
 
     it "should get all of the voters down votes for a class" do
-      @votable.vote :voter => @voter
-      @votable2.vote :voter => @voter, :vote => false
+      @votable.vote :voter => @voter, :vote => 1
+      @votable2.vote :voter => @voter, :vote => -1
       @voter.find_down_votes_for_class(Votable).size.should == 1
       @voter.votes.down.for_type(Votable).count.should == 1
     end
 
     it "should be contained to instances" do
-      @voter.vote :votable => @votable, :vote => false
-      @voter2.vote :votable => @votable
+      @voter.vote :votable => @votable, :vote => -1
+      @voter2.vote :votable => @votable, :vote => 1
 
       @voter.voted_as_when_voting_on(@votable).should be -1
     end
