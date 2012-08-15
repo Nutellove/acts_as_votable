@@ -14,7 +14,9 @@ module ActsAsVotable
     belongs_to :voter, :polymorphic => true
 
     scope :up, where(:value => 1)
+    scope :obiwan, where(:value => 0)
     scope :down, where(:value => -1)
+    scope :valued,   lambda{ |value| where(:value => value) }
     scope :for_type, lambda{ |klass| where(:votable_type => klass) }
     scope :by_type,  lambda{ |klass| where(:voter_type => klass) }
 

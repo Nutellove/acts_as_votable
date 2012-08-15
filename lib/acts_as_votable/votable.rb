@@ -152,14 +152,40 @@ module ActsAsVotable
     end
 
     def mean_vote
-      0
+      votes_count > 0 ? votes_sum.quo(votes_count) : 0
     end
 
     def votes_sum
       find_votes.map(&:value).inject(0, :+)
     end
 
-    ## COUNTING
+    def votes_count(filter={})
+      tmp = find_votes
+      if filter[:voter]; tmp = tmp.find_all{|d| d.voter == filter[:voter]} end
+      if filter[:value]; tmp = tmp.find_all{|d| d.value == filter[:value]} end
+      tmp.size
+    end
+
+    ## VOTERS
+
+    def voted_on_by? voter
+      votes_of(voter).count > 0
+    end
+
+    def votes_of voter
+      find_votes(:voter_id => voter.id, :voter_type => voter.class.name)
+    end
+
+    def vote_of voter
+      votes_of(voter).first
+    end
+
+    def vote_value_of voter
+      vote = vote_of voter
+      (vote) ? vote.value : nil
+    end
+
+    ## STATS IN CACHE
 
     def count_votes_total skip_cache = false
       if !skip_cache && self.respond_to?(:cached_votes_total)
@@ -187,25 +213,6 @@ module ActsAsVotable
         return self.send(:cached_votes_down)
       end
       down_votes.count
-    end
-
-    ## VOTERS
-
-    def voted_on_by? voter
-      votes_of(voter).count > 0
-    end
-
-    def votes_of voter
-      find_votes(:voter_id => voter.id, :voter_type => voter.class.name)
-    end
-
-    def vote_of voter
-      votes_of(voter).first
-    end
-
-    def vote_value_of voter
-      vote = vote_of voter
-      (vote) ? vote.value : nil
     end
 
     ## CACHING
