@@ -53,22 +53,22 @@ describe ActsAsVotable::Voter do
       end
 
       it "should return 1 when a voter has voted true" do
-        @votable.vote :voter => @voter, :vote => true
+        @votable.vote :voter => @voter, :value => true
         @voter.voted_as_when_voted_for(@votable).should be 1
       end
 
       it "should return -1 when a voter has voted false" do
-        @votable.vote :voter => @voter, :vote => false
+        @votable.vote :voter => @voter, :value => false
         @voter.voted_as_when_voted_for(@votable).should be -1
       end
 
       it "should return 42 when a voter has voted 42" do
-        @votable.vote :voter => @voter, :vote => 42
+        @votable.vote :voter => @voter, :value => 42
         @voter.voted_as_when_voted_for(@votable).should be 42
       end
 
       it "has #voted_as_when_voting_on as alias" do
-        @votable.vote :voter => @voter, :vote => -69
+        @votable.vote :voter => @voter, :value => -69
         @voter.voted_as_when_voting_on(@votable).should be -69
       end
 
@@ -77,17 +77,17 @@ describe ActsAsVotable::Voter do
     describe '#voted_up_on?' do
 
       it "should return true if voter has voted true" do
-        @votable.vote :voter => @voter, :vote => 1
+        @votable.vote :voter => @voter, :value => 1
         @voter.voted_up_on?(@votable).should be true
       end
 
       it "should return false if voter has voted false" do
-        @votable.vote :voter => @voter, :vote => -1
+        @votable.vote :voter => @voter, :value => -1
         @voter.voted_up_on?(@votable).should be false
       end
 
       it "should return false if voter has voted obiwan" do
-        @votable.vote :voter => @voter, :vote => 0
+        @votable.vote :voter => @voter, :value => 0
         @voter.voted_up_on?(@votable).should be false
       end
 
@@ -96,24 +96,24 @@ describe ActsAsVotable::Voter do
     describe '#voted_down_on?' do
 
       it "should return true if the voter has voted false" do
-        @votable.vote :voter => @voter, :vote => false
+        @votable.vote :voter => @voter, :value => false
         @voter.voted_down_on?(@votable).should be true
       end
 
       it "should return false if the voter has not voted true" do
-        @votable.vote :voter => @voter, :vote => true
+        @votable.vote :voter => @voter, :value => true
         @voter.voted_down_on?(@votable).should be false
       end
 
       it "should return false if the voter has voted obiwan" do
-        @votable.vote :voter => @voter, :vote => 0
+        @votable.vote :voter => @voter, :value => 0
         @voter.voted_down_on?(@votable).should be false
       end
 
     end
 
     it "should provide reserve functionality, voter can vote on votable" do
-      @voter.vote :votable => @votable, :vote => 'bad'
+      @voter.vote :votable => @votable, :value => 'bad'
       @voter.voted_as_when_voting_on(@votable).should be -1
     end
 
@@ -155,29 +155,29 @@ describe ActsAsVotable::Voter do
     end
 
     it "should get all of the votes votes for a class" do
-      @votable.vote :voter => @voter, :vote => 1
-      @votable2.vote :voter => @voter, :vote => -1
+      @votable.vote :voter => @voter, :value => 1
+      @votable2.vote :voter => @voter, :value => -1
       @voter.find_votes_for_class(Votable).size.should == 2
       @voter.votes.for_type(Votable).count.should == 2
     end
 
     it "should get all of the voters up votes for a class" do
-      @votable.vote :voter => @voter, :vote => 1
-      @votable2.vote :voter => @voter, :vote => -1
+      @votable.vote :voter => @voter, :value => 1
+      @votable2.vote :voter => @voter, :value => -1
       @voter.find_up_votes_for_class(Votable).size.should == 1
       @voter.votes.up.for_type(Votable).count.should == 1
     end
 
     it "should get all of the voters down votes for a class" do
-      @votable.vote :voter => @voter, :vote => 1
-      @votable2.vote :voter => @voter, :vote => -1
+      @votable.vote :voter => @voter, :value => 1
+      @votable2.vote :voter => @voter, :value => -1
       @voter.find_down_votes_for_class(Votable).size.should == 1
       @voter.votes.down.for_type(Votable).count.should == 1
     end
 
     it "should be contained to instances" do
-      @voter.vote :votable => @votable, :vote => -1
-      @voter2.vote :votable => @votable, :vote => 1
+      @voter.vote :votable => @votable, :value => -1
+      @voter2.vote :votable => @votable, :value => 1
 
       @voter.voted_as_when_voting_on(@votable).should be -1
     end

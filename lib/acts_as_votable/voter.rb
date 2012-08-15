@@ -29,28 +29,37 @@ module ActsAsVotable
 
     end
 
-    # voting
+
+    ## VOTING
+
     def vote args
+
       args[:votable].vote args.merge({:voter => self})
     end
 
-    def vote_up_for model=nil
-      vote :votable => model, :vote => 1
+    def vote_for model, value
+      vote :votable => model, :value => value
     end
 
-    def vote_obiwan_for model=nil
-      vote :votable => model, :vote => 0
+    def vote_up_for model
+      vote :votable => model, :value => 1
+    end
+
+    def vote_obiwan_for model
+      vote :votable => model, :value => 0
     end
 
     def vote_down_for model
-      vote :votable => model, :vote => -1
+      vote :votable => model, :value => -1
     end
 
     def unvote_for model
       model.unvote :voter => self
     end
 
-    # results
+
+    ## RESULTS
+
     def voted_on? votable
       votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name)
       votes.size > 0

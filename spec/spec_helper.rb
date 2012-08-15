@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
     t.integer :cached_votes_total
     t.integer :cached_votes_up
+    t.integer :cached_votes_obiwan
     t.integer :cached_votes_down
   end
 
@@ -94,6 +95,15 @@ class ABoringClass
   end
 end
 
+def rand_string length=5
+  (0...length).map{ ('a'..'z').to_a[rand(26)] }.join
+end
+
+def new_voter
+  anon = Voter.new(:name => 'Anon '+rand_string.capitalize)
+  anon.save
+  anon
+end
 
 def clean_database
   models = [ActsAsVotable::Vote, Voter, NotVoter, Votable, NotVotable, VotableCache]
