@@ -1,5 +1,9 @@
 # Acts As Votable (aka Acts As Likeable)
 
+This fork changes :
+- The vote is an Integer, not a bool
+- Votable has some calculus-related accessors (mean_vote, winner_vote, etc.)
+
 Acts As Votable is a Ruby Gem specifically written for Rails/ActiveRecord models.
 The main goals of this gem are:
 
