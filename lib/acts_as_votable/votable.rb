@@ -65,42 +65,32 @@ module ActsAsVotable
       }
     end
 
-    # VOTING
+    ## VOTING
 
-    def vote args={}
-
-      options = {
-          :value => 0,
-      }.merge(args)
-
+    # Options :
+    #   :voter => The Voter of the voting action
+    #   :value => The Value he wants
+    def vote options={}
       self.vote_registered = false
 
-      if options[:voter].nil?
-        return false
-      end
+      options = { :value => 0 }.merge(options)
+      if options[:voter].nil?; return false end
 
       # find the vote
-      _vote_ = vote_of options[:voter]
+      _vote = vote_of options[:voter]
 
-      if _vote_.nil?
-        # this voter has never voted
-        vote = ActsAsVotable::Vote.new(
-            :votable => self,
-            :voter => options[:voter]
-        )
-      else
-        # this voter is potentially changing his vote
-        vote = _vote_
+      if _vote.nil? # this voter has never voted
+        _vote = ActsAsVotable::Vote.new :votable => self, :voter => options[:voter]
       end
 
-      last_update = vote.updated_at
+      last_update = _vote.updated_at
 
-      vote.value = votable_words.meaning_of(options[:value])
+      _vote.value = votable_words.meaning_of(options[:value])
 
-      save_is_a_success = vote.save
+      save_is_a_success = _vote.save
 
       if save_is_a_success
-        self.vote_registered = true if last_update != vote.updated_at
+        self.vote_registered = true if last_update != _vote.updated_at
         update_cached_votes
       else
         self.vote_registered = false
@@ -109,15 +99,19 @@ module ActsAsVotable
       save_is_a_success
     end
 
-    def unvote args={}
-      return false if args[:voter].nil?
-      _votes_ = votes_of args[:voter]
+    # Options :
+    #   :voter => The Voter of the unvoting action
+    def unvote options={}
+      return false if options[:voter].nil?
 
+      _votes_ = votes_of options[:voter]
       return true if _votes_.size == 0
+
       _votes_.each(&:destroy)
       update_cached_votes
       self.vote_registered = false if votes.count == 0
-      return true
+
+      true
     end
 
     def vote_up voter
@@ -135,8 +129,8 @@ module ActsAsVotable
 
     ## RESULTS
 
-    def find_votes extra_conditions = {}
-      votes.where(extra_conditions)
+    def find_votes where_options={}
+      votes.where(where_options)
     end
 
     def up_votes
@@ -164,6 +158,17 @@ module ActsAsVotable
       if filter[:voter]; tmp = tmp.find_all{|d| d.voter == filter[:voter]} end
       if filter[:value]; tmp = tmp.find_all{|d| d.value == filter[:value]} end
       tmp.size
+    end
+
+    # @return Integer The most voted value, or false if no votes or draw
+    def winner_vote
+      return false unless votes_count > 0
+      values = find_votes.map(&:value).group_by{ |v| v }
+      values.each{ |i,a| values[i] = a.size }
+      max = values.max_by{ |a| a[1] }
+
+      return false if max.nil? or values.count{|a| a[1] == max[1]} > 1
+      max[0]
     end
 
     ## VOTERS

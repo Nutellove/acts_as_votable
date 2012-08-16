@@ -22,54 +22,7 @@ describe ActsAsVotable::Votable do
   end
 
 
-  describe "#mean_vote" do
-    before do
-      @votable = Votable.new(:name => 'Free the Seeds')
-      @votable.save
-    end
-    it 'initially is 0 (without votes)' do
-      @votable.mean_vote.should == 0
-    end
-    it 'has the value of the vote if there is only one' do
-      @votable.vote :voter => new_voter, :value => 42
-      @votable.mean_vote.should == 42
-    end
-    it 'holds the mean value of the values of the votes' do
-      [1, 2, 3].each { |v| @votable.vote :voter => new_voter, :value => v }
-      @votable.mean_vote.should == 2
-    end
-    it 'works with negative decision values' do
-      [-5, -25, -30].each { |v| @votable.vote :voter => new_voter, :value => v }
-      @votable.mean_vote.should == -20
-    end
-    it 'works with floating results' do
-      [0, 5].each { |v| @votable.vote :voter => new_voter, :value => v }
-      @votable.mean_vote.should == Rational(5, 2)
-      @votable.mean_vote.should == 2.5
-    end
-  end
 
-  describe "#votes_sum" do
-    before do
-      @votable = Votable.new(:name => 'Free the Seeds')
-      @votable.save
-    end
-    it 'initially is 0 (without decisions)' do
-      @votable.votes_sum.should == 0
-    end
-    it 'has the value of the vote if there is only one' do
-      @votable.vote :voter => new_voter, :value => 42
-      @votable.votes_sum.should == 42
-    end
-    it 'holds the sum of the values of the votes' do
-      [1, 2, 3].each { |v| @votable.vote :voter => new_voter, :value => v }
-      @votable.votes_sum.should == 6
-    end
-    it 'works with negative decision values' do
-      [1, 1, -3].each { |v| @votable.vote :voter => new_voter, :value => v }
-      @votable.votes_sum.should == -1
-    end
-  end
 
   describe "Voting on a votable object" do
 
@@ -337,6 +290,90 @@ describe ActsAsVotable::Votable do
         votable.votes.should have(1).vote
       end
 
+    end
+
+  end
+
+
+
+
+  describe "Accessors with calculus" do
+
+    describe "#mean_vote" do
+      before do
+        @votable = Votable.new(:name => 'Free the Seeds')
+        @votable.save
+      end
+      it 'initially is 0 (without votes)' do
+        @votable.mean_vote.should == 0
+      end
+      it 'has the value of the vote if there is only one' do
+        @votable.vote :voter => new_voter, :value => 42
+        @votable.mean_vote.should == 42
+      end
+      it 'holds the mean value of the values of the votes' do
+        [1, 2, 3].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.mean_vote.should == 2
+      end
+      it 'works with negative decision values' do
+        [-5, -25, -30].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.mean_vote.should == -20
+      end
+      it 'works with floating results' do
+        [0, 5].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.mean_vote.should == Rational(5, 2)
+        @votable.mean_vote.should == 2.5
+      end
+    end
+
+    describe "#votes_sum" do
+      before do
+        @votable = Votable.new(:name => 'Free the Seeds')
+        @votable.save
+      end
+      it 'initially is 0 (without decisions)' do
+        @votable.votes_sum.should == 0
+      end
+      it 'has the value of the vote if there is only one' do
+        @votable.vote :voter => new_voter, :value => 42
+        @votable.votes_sum.should == 42
+      end
+      it 'holds the sum of the values of the votes' do
+        [1, 2, 3].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.votes_sum.should == 6
+      end
+      it 'works with negative decision values' do
+        [1, 1, -3].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.votes_sum.should == -1
+      end
+    end
+
+    describe '#winner_vote' do
+      before do
+        @votable = Votable.new(:name => 'Free the Seeds')
+        @votable.save
+      end
+      it 'should return false initially' do
+        @votable.winner_vote.should be false
+      end
+      it 'should return the value for a single Vote' do
+        [1].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.winner_vote.should == 1
+      end
+      it 'should return the most chosen value of all votes' do
+        [1,1,0,-1].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.winner_vote.should == 1
+        [7,7,7].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.winner_vote.should == 7
+      end
+      it 'should return 0 only if it is the most voted value' do
+        [1,0,0].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.winner_vote.should === 0
+      end
+      it 'should return false in case of a draw' do
+        [5,6].each { |v| @votable.vote :voter => new_voter, :value => v }
+        @votable.winner_vote.should be false
+      end
     end
 
   end
