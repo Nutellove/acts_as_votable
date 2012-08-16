@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "acts_as_votable"
   s.version     = ActsAsVotable::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Ryan","Goutte"]
-  s.email       = ["ryanto"]
+  s.authors     = %w(Ryan Goutte)
+  s.email       = %w(ryanto)
   s.homepage    = "http://rubygems.org/gems/acts_as_votable"
   s.summary     = %q{Rails gem to allowing records to be votable}
   s.description = %q{Rails gem to allowing records to be votable}
