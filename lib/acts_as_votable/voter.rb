@@ -13,7 +13,7 @@ module ActsAsVotable
       base.class_eval do
 
         belongs_to :voter, :polymorphic => true
-        has_many   :votes, :class_name => "ActsAsVotable::Vote", :as => :voter do
+        has_many   :votes, :class_name => ActsAsVotable::Vote, :as => :voter do
           def votables
             includes(:votable).map(&:votable)
           end
@@ -33,7 +33,6 @@ module ActsAsVotable
     ## VOTING
 
     def vote args
-
       args[:votable].vote args.merge({:voter => self})
     end
 
