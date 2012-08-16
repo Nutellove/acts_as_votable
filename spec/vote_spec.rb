@@ -21,6 +21,22 @@ describe ActsAsVotable::Vote do
       @votable2.save
     end
 
+    describe ":valued" do
+      before do
+        @alice.vote_for @votable1, 1
+        @bruno.vote_for @votable1, 1
+      end
+      it "filters votes with a specific value" do
+        @votable1.votes.valued(0).should have(0).vote
+        @votable1.votes.valued(1).should have(2).votes
+        @alice.votes.valued(8).should have(0).vote
+        @alice.votes.valued(1).should have(1).vote
+      end
+      it "returns nothing if value is nil (or invalid)" do
+        @alice.votes.valued(nil).should have(0).vote
+      end
+    end
+
     describe ":on" do
       before do
         @alice.vote_for @votable1, 1
