@@ -77,12 +77,7 @@ module ActsAsVotable
     end
     alias :voted_down_for? :voted_down_on?
 
-    def voted_as_when_voting_on votable
-      votes = find_votes(:votable_id => votable.id, :votable_type => votable.class.name)
-      return nil if votes.size == 0
-      votes.first.value
-    end
-    alias :voted_as_when_voted_for :voted_as_when_voting_on
+
 
     def find_votes extra_conditions = {}
       votes.where(extra_conditions)
@@ -115,6 +110,24 @@ module ActsAsVotable
     def find_down_votes_for_class klass
       find_votes_for_class klass, :value => -1
     end
+
+    # finds the last vote the voter made on specified target
+    def find_vote_on target
+      votes = find_votes :votable_id => target.id, :votable_type => target.class.name
+      return nil if votes.size == 0
+      votes.first
+    end
+    alias :find_vote_for :find_vote_on
+
+    # finds the last value the voter voted on specified target
+    def find_vote_value_on target
+      vote = find_vote_on target
+      return nil if vote.nil?
+      vote.value
+    end
+    alias :find_vote_value_for      :find_vote_value_on
+    alias :voted_as_when_voting_on  :find_vote_value_on
+    alias :voted_as_when_voted_for  :voted_as_when_voting_on
 
   end
 end
