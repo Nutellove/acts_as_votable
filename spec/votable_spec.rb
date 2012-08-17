@@ -380,7 +380,8 @@ describe ActsAsVotable::Votable do
   describe "Defining a custom Vote class that extends ActsAsVotable::Vote" do
 
     before do
-      @alice = Voter.new(:name => 'Alice')
+      # CustomVoter implements acts_as_voter :class => CustomVote
+      @alice = CustomVoter.new(:name => 'Alice')
       @alice.save
       # CustomVotable implements acts_as_votable :class => CustomVote
       @votable = CustomVotable.new(:name => 'Free the Seeds')

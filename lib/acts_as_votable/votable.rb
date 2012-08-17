@@ -37,7 +37,7 @@ module ActsAsVotable
       base.class_eval do
 
         belongs_to :votable, :polymorphic => true
-        has_many :votes, :class_name => ActsAsVotable::Vote, :as => :votable do
+        has_many :votes, :class_name => self.acts_as_votable_vote_class, :as => :votable do
           def voters
             includes(:voter).map(&:voter)
           end
@@ -70,6 +70,7 @@ module ActsAsVotable
     # Options :
     #   :voter => The Voter of the voting action
     #   :value => The Value he wants
+    # @return Boolean Successful save ?
     def vote options={}
       self.vote_registered = false
 
@@ -80,7 +81,9 @@ module ActsAsVotable
       _vote = vote_of options[:voter]
 
       if _vote.nil? # this voter has never voted
-        _vote = ActsAsVotable::Vote.new :votable => self, :voter => options[:voter]
+        #puts self.inspect
+        #a = self.class
+        _vote = self.class.acts_as_votable_vote_class.new :votable => self, :voter => options[:voter]
       end
 
       last_update = _vote.updated_at
@@ -178,7 +181,7 @@ module ActsAsVotable
     end
 
     def votes_of voter
-      find_votes(:voter_id => voter.id, :voter_type => voter.class.name)
+      find_votes(:voter_id => voter.id, :voter_type => voter.class.base_class.name.to_s)
     end
 
     def vote_of voter

@@ -20,6 +20,10 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
   end
 
+  create_table :custom_voters do |t|
+    t.string :name
+  end
+
   create_table :not_voters do |t|
     t.string :name
   end
@@ -59,6 +63,7 @@ end
 
 class Voter < ActiveRecord::Base
   acts_as_voter
+  validates_presence_of :name
 end
 
 class NotVoter < ActiveRecord::Base
@@ -99,6 +104,11 @@ end
 
 class CustomVotable < ActiveRecord::Base
   acts_as_votable :class => CustomVote
+  validates_presence_of :name
+end
+
+class CustomVoter < ActiveRecord::Base
+  acts_as_voter :class => CustomVote
   validates_presence_of :name
 end
 
