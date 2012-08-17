@@ -74,8 +74,8 @@ more natural calls are the first few examples.
     @post.liked_by @user1
     @post.downvote_from @user2
     @post.vote :voter => @user3
-    @post.vote :voter => @user4, :vote => 'bad'
-    @post.vote :voter => @user5, :vote => 'like'
+    @post.vote :voter => @user4, :value => 'bad'
+    @post.vote :voter => @user5, :value => 'like'
 
 
 By default all votes are positive, so @user3 has cast a 'good' vote for @post.
@@ -94,11 +94,11 @@ Revisiting the previous example of code.
     # positive votes
     @post.liked_by @user1
     @post.vote :voter => @user3
-    @post.vote :voter => @user5, :vote => 'like'
+    @post.vote :voter => @user5, :value => 'like'
 
     # negative votes
     @post.downvote_from @user2
-    @post.vote :voter => @user2, :vote => 'bad'
+    @post.vote :voter => @user2, :value => 'bad'
 
     # tally them up!
     @post.votes.size # => 5
