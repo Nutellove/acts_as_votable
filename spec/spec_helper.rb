@@ -24,6 +24,10 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :name
   end
 
+  create_table :custom_votables do |t|
+    t.string :name
+  end
+
   create_table :votables do |t|
     t.string :name
   end
@@ -86,6 +90,15 @@ end
 
 class VotableCache < ActiveRecord::Base
   acts_as_votable
+  validates_presence_of :name
+end
+
+class CustomVote < ActsAsVotable::Vote
+
+end
+
+class CustomVotable < ActiveRecord::Base
+  acts_as_votable :class => CustomVote
   validates_presence_of :name
 end
 

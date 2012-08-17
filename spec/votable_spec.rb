@@ -22,8 +22,6 @@ describe ActsAsVotable::Votable do
   end
 
 
-
-
   describe "Voting on a votable object" do
 
     before do
@@ -373,6 +371,38 @@ describe ActsAsVotable::Votable do
       it 'should return false in case of a draw' do
         [5,6].each { |v| @votable.vote :voter => new_voter, :value => v }
         @votable.winner_vote.should be false
+      end
+    end
+
+  end
+
+
+  describe "Defining a custom Vote class that extends ActsAsVotable::Vote" do
+
+    before do
+      @alice = Voter.new(:name => 'Alice')
+      @alice.save
+      # CustomVotable implements acts_as_votable :class => CustomVote
+      @votable = CustomVotable.new(:name => 'Free the Seeds')
+      @votable.save
+
+      @votable.vote :voter => @alice, :value => 'yes'
+    end
+
+    it "should have one vote" do
+      @votable.votes.should have(1).vote
+      @alice.votes.should have(1).vote
+    end
+
+    describe "Votable.votes" do
+      it "should have CustomVotes, not ActsAsVotable::Vote" do
+        @votable.votes.by(@alice).first.should be_a CustomVote
+      end
+    end
+
+    describe "Voter.votes" do
+      it "should have CustomVotes, not ActsAsVotable::Vote" do
+        @alice.votes.on(@votable).first.should be_a CustomVote
       end
     end
 
