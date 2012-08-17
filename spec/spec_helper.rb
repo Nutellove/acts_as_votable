@@ -16,6 +16,19 @@ ActiveRecord::Schema.define(:version => 1) do
   add_index :votes, [:votable_id, :votable_type]
   add_index :votes, [:voter_id, :voter_type]
 
+  create_table :custom_votes do |t|
+    t.references :votable, :polymorphic => true
+    t.references :voter, :polymorphic => true
+
+    t.integer :value
+    t.integer :custom_field
+
+    t.timestamps
+  end
+
+  add_index :custom_votes, [:votable_id, :votable_type]
+  add_index :custom_votes, [:voter_id, :voter_type]
+
   create_table :voters do |t|
     t.string :name
   end
@@ -98,8 +111,8 @@ class VotableCache < ActiveRecord::Base
   validates_presence_of :name
 end
 
-class CustomVote < ActsAsVotable::Vote
-
+class CustomVote < ActiveRecord::Base
+  include ActsAsVotable::VoteBehavior
 end
 
 class CustomVotable < ActiveRecord::Base
