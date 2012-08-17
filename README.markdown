@@ -3,6 +3,10 @@
 This fork changes :
 - The vote is an Integer, not a bool
 - Votable has some calculus-related accessors (mean_vote, winner_vote, etc.)
+- Allowing custom Vote class (that need to extend ActsAsVotable::Vote), by providing option :
+    acts_as_votable :class => CustomVote
+    acts_as_voter :class => CustomVote
+
 
 Acts As Votable is a Ruby Gem specifically written for Rails/ActiveRecord models.
 The main goals of this gem are:
