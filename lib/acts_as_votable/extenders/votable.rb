@@ -4,18 +4,15 @@ module ActsAsVotable
     module Votable
 
       def votable?; false end
+
+      include ActsAsVotable::Extenders::CustomizableVoteClass
+
       def acts_as_votable_vote_class; ActsAsVotable::Vote end
 
       # args may contain :class => CustomVote
       def acts_as_votable args={}
 
-        # First, we configure the Vote class (how not to eval?)
-        unless args[:class].nil?
-          raise "Please provide a Class for :class" unless args[:class].is_a? Class
-          class_eval %Q{
-            def self.acts_as_votable_vote_class; #{args[:class]} end
-          }
-        end
+        acts_as_votable_process_args args
 
         require 'acts_as_votable/votable'
         include ActsAsVotable::Votable

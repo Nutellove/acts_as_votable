@@ -6,6 +6,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 module ActsAsVotable
 
   if defined?(ActiveRecord::Base)
+    require 'acts_as_votable/extenders/customizable_vote_class'
     require 'acts_as_votable/extenders/votable'
     require 'acts_as_votable/extenders/voter'
     require 'acts_as_votable/vote'
